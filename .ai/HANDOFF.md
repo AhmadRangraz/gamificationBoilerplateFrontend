@@ -8,4 +8,6 @@ M8 shares infrastructure across six generated presets. The generated OpenAPI con
 
 Email, reward fulfillment and assistant responses remain local or mocked. Native PWA installation requires a browser profile that permits it. [Mock integrations](../docs/MOCKS.md) · [PWA verification](../docs/PWA.md)
 
-M9 adds a native PWA job and retained Playwright reports to the hosted workflow. Quote the exact commit and job result when updating the M5 installation status. [Release verification](../docs/TESTING.md#release-verification)
+M9 passed all nine hosted jobs, including native PWA installation, for commit `ed71145`. The run retains Playwright reports. [Release verification](../docs/TESTING.md#release-verification)
+
+M10 adds the deployment smoke command and a local PostgreSQL backup and recovery rehearsal. Run the smoke command through the web origin after each deployment. [Operations commands](../docs/DEPLOYMENT.md#deployment-smoke-check)

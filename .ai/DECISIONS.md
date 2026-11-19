@@ -90,3 +90,8 @@ Compatibility references reviewed before installing dependencies included the of
 
 - Use a generated project on the hosted runner for the native PWA test. Preserve the managed browser policy and record installation results separately from headless eligibility and offline checks.
 - Keep HTML browser reports on the workflow run for 14 days for release review.
+
+## Deployment verification and recovery
+
+- Check readiness, status-page security headers, PWA manifest, and worker headers through one web origin. Accept HTTPS and local loopback HTTP.
+- Use the local Compose PostgreSQL client tools for backups and verify each archive in a separately named database. Publish a completed archive with an exclusive hard link and drop the scratch database after the rehearsal.

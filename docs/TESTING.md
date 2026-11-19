@@ -70,6 +70,8 @@ The Verify Forge workflow runs on a push, pull request, or manual dispatch. Its 
 
 The first hosted run passed source checks, four preset jobs, and the individual variant. Both full browser suites stopped at the mobile password recovery confirmation. The account test now waits for the recovery route and confirms the submission response. Two local repetitions passed with the hosted version of Chrome Headless Shell. [Baseline run](https://github.com/AhmadRangraz/gamificationBoilerplateFrontend/actions/runs/44562213070)
 
+All nine hosted jobs passed for M9 commit `ed71145`. The run includes all six presets, the individual challenge variant, source checks, and native PWA installation. Download the retained browser reports from the run page. [M9 run and reports](https://github.com/AhmadRangraz/gamificationBoilerplateFrontend/actions/runs/44595264192)
+
 To reproduce the native check on Linux in a browser environment that permits installation, start PostgreSQL and build the app, then run:
 
 ```sh
@@ -78,3 +80,7 @@ FORGE_E2E_HEADED_INSTALL=1 xvfb-run -a pnpm test:e2e tests/pwa.spec.ts --grep 'd
 ```
 
 Use the commit SHA and job result as evidence for a release. The managed cloud browser still requires a permitted browser profile for native installation. [CI workflow](../.github/workflows/verify.yml) · [PWA checks](PWA.md#verify-locally)
+
+## Deployment and recovery checks
+
+The foundation suite runs the smoke command against the built web and API, using the preset's PWA setting. The local PostgreSQL rehearsal verified a mode-0600 backup, a completed restore and schema check, refusal to replace an existing archive, and cleanup after a corrupt archive was rejected. [Deployment commands](DEPLOYMENT.md#deployment-smoke-check)

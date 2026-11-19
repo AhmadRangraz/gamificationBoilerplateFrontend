@@ -18,6 +18,9 @@
     "test:e2e": "playwright test",
     "db:up": "docker compose up -d --wait db",
     "db:migrate": "pnpm --filter @forge/api db:migrate",
+    "db:backup": "node tooling/db-recovery.mjs backup",
+    "db:restore-verify": "node tooling/db-recovery.mjs restore-verify",
+    "ops:smoke": "node tooling/deployment-smoke.mjs",
     "contract:generate": "turbo run build --filter=@forge/api && node tooling/contract.mjs",
     "contract:check": "turbo run build --filter=@forge/api && node tooling/contract.mjs --check",
     "forge": "node tooling/forge.mts"

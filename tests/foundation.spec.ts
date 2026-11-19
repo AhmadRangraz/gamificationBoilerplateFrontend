@@ -1,4 +1,7 @@
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { expect, test } from '@playwright/test';
+import forgeConfig from '../forge.config';
 
 const healthPath = '/api/v1/health';
 
@@ -25,6 +28,23 @@ test('Next forwards the API through the web origin', async ({ request }) => {
   const response = await request.get(healthPath);
   expect(response.status()).toBe(200);
   expect(await response.json()).toEqual({ status: 'ready', database: 'ready' });
+});
+
+test('the deployment smoke command checks the built web and API', async ({
+  baseURL,
+}) => {
+  const args = [
+    'tooling/deployment-smoke.mjs',
+    baseURL!,
+    ...(forgeConfig.pwa.enabled ? [] : ['--pwa-disabled']),
+  ];
+  const { stdout } = await promisify(execFile)(process.execPath, args);
+  expect(stdout).toContain(
+    'API and PostgreSQL are ready through the web origin.',
+  );
+  expect(stdout).toContain(
+    'The service worker allows root scope and forbids HTTP caching.',
+  );
 });
 
 test('the Persian RTL dashboard renders real database readiness on mobile', async ({

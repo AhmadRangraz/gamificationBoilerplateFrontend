@@ -7,7 +7,7 @@ Run PostgreSQL and the two Node processes separately. Use a TLS reverse proxy fo
 3. With production environment values available, apply `pnpm db:migrate` from the monorepo root.
 4. Set `FORGE_API_ORIGIN` on the web build and web process to the same private API origin, then run `pnpm build`.
 5. Run `pnpm --filter @forge/api start` and `pnpm --filter @forge/web start` under the service manager with `NODE_ENV=production`. If the two apps run on separate hosts, set `API_HOST` to the API’s private listening interface.
-6. Check `GET /api/v1/health` through the web origin. A 503 means the API cannot query the migrated schema.
+6. Run the deployment smoke check against the public origin after the web process starts. A 503 from `/api/v1/health` means the API cannot query the migrated schema.
 
 The Compose file and example credentials are for local development. On production, the API requires the database URL in its process environment and disables Swagger UI.
 
@@ -16,6 +16,30 @@ The web process sends frame, MIME-sniffing and referrer headers and a CSP for fr
 ## PWA deployment
 
 Serve via HTTPS and preserve the uncached `/sw.js` response. Set `pwa.revision` when deploying a new release and follow the install and offline checks in [PWA.md](PWA.md).
+
+## Deployment smoke check
+
+```sh
+pnpm ops:smoke https://forge.example.test
+```
+
+Use your deployed HTTPS origin, or `http://localhost:3000` for local verification. The check exits with an error if API or database readiness fails, if the web status page lacks its security headers, or if the PWA manifest or worker has incorrect headers or scope. Add `--pwa-disabled` when the preset disables the PWA. The manifest should then return 404 and the worker should remain available to retire earlier installations.
+
+## PostgreSQL recovery rehearsal
+
+Run these commands from the root of a checkout with a running, migrated local Compose database:
+
+```sh
+mkdir -p .forge-local/backups
+pnpm db:backup .forge-local/backups/forge.dump
+pnpm db:restore-verify .forge-local/backups/forge.dump
+```
+
+The backup streams the Compose PostgreSQL database to a private PostgreSQL custom-format archive. Choose a new filename for each backup. The command publishes the archive only after the dump succeeds and preserves any file already at that path.
+
+Restore only an archive you trust. The verification command creates a disposable database on the local Compose server, restores schema and data in a transaction, checks the FORGE tables and migration records, and drops the disposable database after the check. It leaves the application database in place. If the process is forcibly interrupted, check the local server for a leftover database named `forge_restore_*` before removing that scratch database.
+
+Use your PostgreSQL provider's backup and point-in-time recovery for production. Rehearse the provider restore into a separate database, verify the recovered release against it, and keep archives in access-controlled storage.
 
 ## Account operations
 
