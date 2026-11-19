@@ -1,0 +1,415 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Workspace {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique @db.VarChar(64)
+  name      String   @db.VarChar(160)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+enum AccountRole {
+  MEMBER
+  ADMIN
+}
+
+model Account {
+  id               String          @id @default(uuid()) @db.Uuid
+  email            String          @unique @db.VarChar(254)
+  name             String          @db.VarChar(100)
+  passwordHash     String
+  role             AccountRole     @default(MEMBER)
+  suspendedAt      DateTime?       @db.Timestamptz(3)
+  createdAt        DateTime        @default(now()) @db.Timestamptz(3)
+  leaderboardOptIn Boolean         @default(false)
+  pointLedger      PointEntry[]
+  questProgress    QuestProgress[]
+  missionProgress  MissionProgress[]
+  rewardRedemptions RewardRedemption[]
+  challengeEntries ChallengeEntry[]
+  referral         Referral? @relation("ReferredAccount")
+  referrals        Referral[] @relation("Referrer")
+  goal             ActivityGoal?
+  leaderboardBanned Boolean @default(false)
+  streakProtections StreakProtection[]
+  services         ServiceOffering[]
+  appointments     Appointment[]
+  posts            CommunityPost[]
+  comments         CommunityComment[]
+  reactions        CommunityReaction[]
+  lessonCompletions LessonCompletion[]
+  conversations    Conversation[]
+  sessions         Session[]
+  actions          AccountAction[]
+  listings         Listing[]
+  favorites        Favorite[]
+  avatar           Avatar?
+  emailVerified    Boolean         @default(false)
+}
+
+model Session {
+  tokenHash String   @id @db.Char(64)
+  accountId String   @db.Uuid
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([accountId])
+  @@index([expiresAt])
+}
+
+model AuthAttempt {
+  key       String   @id @db.Char(64)
+  count     Int
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+}
+
+enum AccountActionKind {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model AccountAction {
+  tokenHash String            @id @db.Char(64)
+  kind      AccountActionKind
+  accountId String            @db.Uuid
+  account   Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  expiresAt DateTime          @db.Timestamptz(3)
+
+  @@unique([accountId, kind])
+  @@index([expiresAt])
+}
+
+enum AccountAuditEvent {
+  REGISTER
+  LOGIN
+  LOGOUT
+  EMAIL_VERIFIED
+  PASSWORD_RESET
+  ACCOUNT_SUSPENDED
+  ACCOUNT_RESTORED
+}
+
+model AccountAudit {
+  id        String            @id @default(uuid()) @db.Uuid
+  event     AccountAuditEvent
+  accountId String            @db.Uuid
+  actorId   String?           @db.Uuid
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+
+  @@index([accountId, createdAt])
+}
+
+model Avatar {
+  accountId String  @id @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  image     Bytes
+}
+
+enum ListingCategory {
+  HANDMADE
+  BOOKS
+  ELECTRONICS
+}
+
+model Listing {
+  id          String          @id @default(uuid()) @db.Uuid
+  ownerId     String          @db.Uuid
+  owner       Account         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title       String          @db.VarChar(100)
+  description String          @db.VarChar(1200)
+  category    ListingCategory
+  price       Int
+  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
+  demoKey     String?         @unique @db.VarChar(64)
+  favorites   Favorite[]
+
+  @@index([createdAt, id])
+  @@index([category, createdAt, id])
+  @@index([ownerId, createdAt, id])
+}
+
+model Favorite {
+  accountId String  @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  listingId String  @db.Uuid
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, listingId])
+  @@index([listingId])
+}
+
+enum PointEvent {
+  ADMIN_ADJUSTMENT
+  EMAIL_VERIFIED
+  LISTING_PUBLISHED
+  QUEST_COMPLETED
+  MISSION_COMPLETED
+  REWARD_REDEEMED
+  CHALLENGE_COMPLETED
+  REFERRAL_COMPLETED
+  POST_PUBLISHED
+  LESSON_COMPLETED
+  STREAK_PROTECTED
+}
+
+enum PointOutcome {
+  AWARDED
+  CAPPED
+}
+
+model PointEntry {
+  id        String       @id @default(uuid()) @db.Uuid
+  accountId String       @db.Uuid
+  account   Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  event     PointEvent
+  actorId   String?      @db.Uuid
+  reason    String?      @db.VarChar(240)
+  sourceId  String       @db.Uuid
+  outcome   PointOutcome
+  points    Int
+  xp        Int
+  earnedDay String       @db.Char(10)
+  createdAt DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@unique([event, sourceId])
+  @@index([accountId, event, earnedDay, outcome])
+  @@index([accountId, createdAt, id])
+}
+
+model QuestProgress {
+  id          String    @id @default(uuid()) @db.Uuid
+  accountId   String    @db.Uuid
+  account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  questKey    String    @db.VarChar(64)
+  occurrence  String    @default("once") @db.VarChar(10)
+  count       Int
+  completedAt DateTime? @db.Timestamptz(3)
+
+  @@unique([accountId, questKey, occurrence])
+}
+
+model MissionProgress {
+  id             String    @id @default(uuid()) @db.Uuid
+  accountId      String    @db.Uuid
+  account        Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  missionKey     String    @db.VarChar(64)
+  completedSteps Int
+  stepCount      Int
+  completedAt    DateTime? @db.Timestamptz(3)
+
+  @@unique([accountId, missionKey])
+}
+
+model RewardRedemption {
+  id        String   @id @default(uuid()) @db.Uuid
+  accountId String   @db.Uuid
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  requestId String   @db.Uuid
+  rewardKey String   @db.VarChar(64)
+  title     String   @db.VarChar(100)
+  cost      Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([accountId, requestId])
+  @@index([accountId, createdAt, id])
+}
+
+model ChallengeEntry {
+  id           String @id @default(uuid()) @db.Uuid
+  accountId    String @db.Uuid
+  account      Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  challengeKey String @db.VarChar(64)
+  count        Int @default(0)
+  joinedAt     DateTime @default(now()) @db.Timestamptz(3)
+  claimedAt    DateTime? @db.Timestamptz(3)
+
+  @@unique([accountId, challengeKey])
+  @@index([challengeKey])
+}
+
+model ChallengeGroup {
+  key String @id @db.VarChar(64)
+  count Int
+}
+
+model StreakProtection {
+  id String @id @default(uuid()) @db.Uuid
+  accountId String @db.Uuid
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  day String @db.Char(10)
+  week String @db.Char(10)
+
+  @@unique([accountId, day])
+  @@unique([accountId, week])
+}
+
+model Referral {
+  accountId   String @id @db.Uuid
+  account     Account @relation("ReferredAccount", fields: [accountId], references: [id], onDelete: Cascade)
+  referrerId  String @db.Uuid
+  referrer    Account @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  qualifiedAt DateTime? @db.Timestamptz(3)
+  claimedAt   DateTime? @db.Timestamptz(3)
+
+  @@index([referrerId, qualifiedAt])
+}
+
+model ActivityGoal {
+  accountId String @id @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  target    Int
+  startedAt DateTime @db.Timestamptz(3)
+}
+
+model GamificationControl {
+  key   String @id @db.VarChar(80)
+  value Int
+}
+
+model GamificationAudit {
+  id        String @id @default(uuid()) @db.Uuid
+  actorId   String @db.Uuid
+  key       String @db.VarChar(80)
+  value     Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model ServiceOffering {
+  id          String @id @default(uuid()) @db.Uuid
+  providerId  String @db.Uuid
+  provider    Account @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  title       String @db.VarChar(100)
+  description String @db.VarChar(1000)
+  demoKey     String? @unique @db.VarChar(64)
+  slots       ServiceSlot[]
+}
+
+model ServiceSlot {
+  id          String @id @default(uuid()) @db.Uuid
+  serviceId   String @db.Uuid
+  service     ServiceOffering @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  startsAt    DateTime @db.Timestamptz(3)
+  appointment Appointment?
+
+  @@unique([serviceId, startsAt])
+  @@index([startsAt])
+}
+
+enum AppointmentStatus {
+  REQUESTED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Appointment {
+  id          String @id @default(uuid()) @db.Uuid
+  customerId  String @db.Uuid
+  customer    Account @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  slotId      String @unique @db.Uuid
+  slot        ServiceSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  status      AppointmentStatus @default(REQUESTED)
+
+  @@index([customerId])
+}
+
+model CommunityPost {
+  id        String @id @default(uuid()) @db.Uuid
+  authorId  String @db.Uuid
+  author    Account @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String @db.VarChar(2000)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  demoKey   String? @unique @db.VarChar(64)
+  comments  CommunityComment[]
+  reactions CommunityReaction[]
+
+  @@index([createdAt, id])
+  @@index([authorId])
+}
+
+model CommunityComment {
+  id        String @id @default(uuid()) @db.Uuid
+  postId    String @db.Uuid
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String @db.Uuid
+  author    Account @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String @db.VarChar(600)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([postId, createdAt, id])
+}
+
+model CommunityReaction {
+  postId    String @db.Uuid
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  accountId String @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@id([postId, accountId])
+}
+
+model Course {
+  id          String @id @default(uuid()) @db.Uuid
+  slug        String @unique @db.VarChar(64)
+  title       String @db.VarChar(100)
+  description String @db.VarChar(1000)
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String @id @default(uuid()) @db.Uuid
+  courseId    String @db.Uuid
+  course      Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  position    Int
+  title       String @db.VarChar(100)
+  body        String @db.VarChar(3000)
+  completions LessonCompletion[]
+
+  @@unique([courseId, position])
+}
+
+model LessonCompletion {
+  id        String @id @default(uuid()) @db.Uuid
+  accountId String @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  lessonId  String @db.Uuid
+  lesson    Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([accountId, lessonId])
+}
+
+model Conversation {
+  id        String @id @default(uuid()) @db.Uuid
+  accountId String @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  title     String @db.VarChar(100)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  turns     ConversationTurn[]
+
+  @@index([accountId, updatedAt, id])
+}
+
+model ConversationTurn {
+  id             String @id @default(uuid()) @db.Uuid
+  conversationId String @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  requestId      String @db.Uuid
+  prompt         String @db.VarChar(1000)
+  reply          String @db.VarChar(2000)
+  topic          String @db.VarChar(20)
+  position       Int
+
+  @@unique([conversationId, requestId])
+  @@unique([conversationId, position])
+}
