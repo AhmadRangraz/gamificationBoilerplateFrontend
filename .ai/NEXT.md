@@ -20,3 +20,7 @@ Native installation is a separate headed Chromium check. The managed browser pol
 ## Exact continuation prompt
 
 > Read AGENTS.md, .ai/STATE.md and .ai/NEXT.md. Start from the verified M7 and M8 implementations and the recorded test matrix. For any new task, keep integrations local or mocked until requested, verify the affected preset and PostgreSQL invariants, and update the roadmap and all four .ai files with the observed results. Preserve the native PWA blocker until a browser profile that permits installation verifies it.
+
+## Release follow-up
+
+Verify the hosted release run for the commit being reviewed. Record the native result and artifact links. Continue M10 with local deployment smoke and database recovery tooling. [Release checks](../docs/TESTING.md#release-verification)

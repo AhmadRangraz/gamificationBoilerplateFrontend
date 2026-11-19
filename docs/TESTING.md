@@ -62,4 +62,19 @@ The following samples came from a 360 × 780 Chromium viewport on the generated 
 
 The generated Booking project also passed `pnpm setup` with a separate Compose database and all 13 migrations. A production-mode API process connected to migrated PostgreSQL, returned HTTP 200 for health and returned HTTP 404 for Swagger.
 
-A separate Marketplace checkout with an individual challenge and weekly quest passed nine applicable gamification checks. GitHub Actions execution is pending. The equivalent matrix passed locally.
+A separate Marketplace checkout with an individual challenge and weekly quest passed nine applicable gamification checks.
+
+## Release verification
+
+The Verify Forge workflow runs on a push, pull request, or manual dispatch. Its generated matrix retains HTML browser reports for 14 days, including test failures and the recorded lab measurements. The `native-pwa` job checks native install, launch, and uninstall on headed Chromium. The normal SaaS suite covers installability, offline behavior, cache isolation, and service-worker updates.
+
+The first hosted run passed source checks, four preset jobs, and the individual variant. Both full browser suites stopped at the mobile password recovery confirmation. The account test now waits for the recovery route and confirms the submission response. Two local repetitions passed with the hosted version of Chrome Headless Shell. [Baseline run](https://github.com/AhmadRangraz/gamificationBoilerplateFrontend/actions/runs/44562213070)
+
+To reproduce the native check on Linux in a browser environment that permits installation, start PostgreSQL and build the app, then run:
+
+```sh
+pnpm exec playwright install --with-deps chromium
+FORGE_E2E_HEADED_INSTALL=1 xvfb-run -a pnpm test:e2e tests/pwa.spec.ts --grep 'disposable profile'
+```
+
+Use the commit SHA and job result as evidence for a release. The managed cloud browser still requires a permitted browser profile for native installation. [CI workflow](../.github/workflows/verify.yml) · [PWA checks](PWA.md#verify-locally)

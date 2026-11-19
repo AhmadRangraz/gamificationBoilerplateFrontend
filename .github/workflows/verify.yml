@@ -3,6 +3,7 @@ name: Verify Forge
 on:
   pull_request:
   push:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,7 +27,16 @@ jobs:
       fail-fast: false
       matrix:
         preset:
-          [saas, marketplace, booking, community, learning, ai, individual]
+          [
+            saas,
+            marketplace,
+            booking,
+            community,
+            learning,
+            ai,
+            individual,
+            native-pwa,
+          ]
     services:
       postgres:
         image: postgres:17
@@ -50,9 +60,14 @@ jobs:
       - name: Generate an isolated checkout
         run: |
           template="$PRESET"
-          if [ "$PRESET" = individual ]; then template=marketplace; fi
+          case "$PRESET" in
+            individual) template=marketplace ;;
+            native-pwa) template=saas ;;
+          esac
           pnpm forge init "$RUNNER_TEMP/forge-$PRESET" --template "$template"
       - name: Verify generated project
+        env:
+          PLAYWRIGHT_HTML_OPEN: never
         run: |
           cd "$RUNNER_TEMP/forge-$PRESET"
           pnpm install --frozen-lockfile
@@ -66,7 +81,18 @@ jobs:
           pnpm build
           pnpm exec playwright install --with-deps chromium
           case "$PRESET" in
-            saas|marketplace) pnpm test:e2e --workers=1 --retries=1 ;;
-            individual) pnpm test:e2e tests/engagement.spec.ts tests/gamification.spec.ts --workers=1 --retries=1 ;;
-            *) pnpm test:e2e tests/presets.spec.ts --retries=1 ;;
+            saas|marketplace) pnpm test:e2e --workers=1 --retries=1 --reporter=list,html ;;
+            individual) pnpm test:e2e tests/engagement.spec.ts tests/gamification.spec.ts --workers=1 --retries=1 --reporter=list,html ;;
+            native-pwa)
+              FORGE_E2E_HEADED_INSTALL=1 xvfb-run -a pnpm test:e2e tests/pwa.spec.ts --grep 'disposable profile' --reporter=list,html
+              ;;
+            *) pnpm test:e2e tests/presets.spec.ts --retries=1 --reporter=list,html ;;
           esac
+      - name: Retain browser results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-results-${{ matrix.preset }}
+          path: ${{ runner.temp }}/forge-${{ matrix.preset }}/playwright-report
+          retention-days: 14
+          if-no-files-found: ignore

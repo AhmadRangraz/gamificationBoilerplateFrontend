@@ -1,6 +1,6 @@
 # PWA
 
-Both presets use the same manifest, install icons, and Persian offline screen. The service worker registers on production builds in a secure context. Use HTTPS for a deployed app or localhost for local testing.
+All six presets use the same manifest, install icons, and Persian offline screen. The service worker registers on production builds in a secure context. Use HTTPS for a deployed app or localhost for local testing.
 
 ## Configuration
 
@@ -37,3 +37,5 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium pnpm test:e2e tests/pwa.spec.ts
 ```
 
 The default Chromium test validates installability in a disposable profile, mocks the browser prompt event to check the app button, and tests a real service worker update and offline behavior. With an available display and a browser profile that permits native installation, run the install and launch check with `FORGE_E2E_HEADED_INSTALL=1` and `--grep 'disposable profile'`. In the managed cloud Chromium, `WebAppInstallByUserEnabled=false` blocks native installation and the protocol returns `kWebAppDisabled`. Native installation remains unverified there.
+
+The hosted `native-pwa` matrix job generates a SaaS checkout and runs the actual install, launch, and uninstall sequence on its headed Chromium under Xvfb. Its Playwright report records the result. [Release verification](TESTING.md#release-verification)

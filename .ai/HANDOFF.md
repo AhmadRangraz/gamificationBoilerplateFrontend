@@ -7,3 +7,5 @@ M7's advanced features share the existing trusted-event pipeline, account lock a
 M8 shares infrastructure across six generated presets. The generated OpenAPI contract is a superset, while runtime Nest modules and web routes follow the effective feature flags. [Template workflows](../docs/TEMPLATES.md)
 
 Email, reward fulfillment and assistant responses remain local or mocked. Native PWA installation requires a browser profile that permits it. [Mock integrations](../docs/MOCKS.md) · [PWA verification](../docs/PWA.md)
+
+M9 adds a native PWA job and retained Playwright reports to the hosted workflow. Quote the exact commit and job result when updating the M5 installation status. [Release verification](../docs/TESTING.md#release-verification)

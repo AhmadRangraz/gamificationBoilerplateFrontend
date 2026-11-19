@@ -85,3 +85,8 @@ Compatibility references reviewed before installing dependencies included the of
 - Use local date keys for recurring quests and streak protection, UTC timestamps for windows, and stable user consent for ranking visibility. Audit cap, price and moderator changes.
 - Keep each preset as its own feature gate within the monorepo. Booking uses a unique slot reservation, Community stores reactions by member and post, Learning stores one completion per learner and lesson, and AI persists structured local replies before streaming.
 - Generate and test clean template checkouts with a fresh database and a frozen install. Treat measured browser timings as lab data and keep native PWA installation as a separate browser-policy check.
+
+## Release checks
+
+- Use a generated project on the hosted runner for the native PWA test. Preserve the managed browser policy and record installation results separately from headless eligibility and offline checks.
+- Keep HTML browser reports on the workflow run for 14 days for release review.

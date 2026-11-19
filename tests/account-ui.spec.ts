@@ -75,8 +75,17 @@ test('Persian account flows work with keyboard navigation and mock email on mobi
     await page.getByRole('button', { name: ui.logout }).click();
     await expect(page.getByRole('heading', { name: ui.login })).toBeVisible();
     await page.getByRole('link', { name: ui.recover }).click();
+    await expect(page).toHaveURL(/\/auth\/recover$/);
     await page.getByLabel(ui.email).fill(email);
-    await page.getByRole('button', { name: ui.recover }).click();
+    const [recovery] = await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          new URL(response.url()).pathname === '/api/v1/auth/password/request',
+      ),
+      page.getByRole('button', { name: ui.recover }).click(),
+    ]);
+    expect(recovery.status()).toBe(204);
     await expect(page.getByText(ui.resetRequested)).toBeVisible();
     const reset = (await messagesFor(email)).find(
       (message) => message.kind === 'RESET_PASSWORD',
