@@ -95,3 +95,13 @@ Compatibility references reviewed before installing dependencies included the of
 
 - Check readiness, status-page security headers, PWA manifest, and worker headers through one web origin. Accept HTTPS and local loopback HTTP.
 - Use the local Compose PostgreSQL client tools for backups and verify each archive in a separately named database. Publish a completed archive with an exclusive hard link and drop the scratch database after the rehearsal.
+
+## Windows local startup
+
+- Retried the frozen install with a longer fetch timeout and lower network concurrency in the setup process environment. The repository lockfile and supply-chain settings were preserved.
+
+- Serve the generated all-preset contract in development Swagger while retaining runtime preset and feature gating.
+
+- Provisioned demo accounts in the loopback development database using the existing password hasher and generated passwords.
+
+- Keep the SaaS home and existing development database for the combined demo. Enable every feature through explicit overrides and configure a group challenge and season with UTC windows.

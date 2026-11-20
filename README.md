@@ -12,7 +12,7 @@ pnpm setup --dev
 
 Setup creates an ignored `.env` from `.env.example` if needed, installs locked dependencies, starts PostgreSQL, applies migrations, and starts both development processes. It preserves an existing `.env` and PostgreSQL volume. In a managed workspace with a restricted home directory, set `pnpm_config_store_dir` to a writable cache directory before running setup. Allow `binaries.prisma.sh` on restricted networks so Prisma can download and verify its native engine.
 
-The web app runs on port 3000. The API listens on loopback port 4000 and serves Swagger at `/docs` in local development. `GET /api/v1/health` checks PostgreSQL through Prisma and is available through the web origin.
+The web app runs on port 3000. The API listens on loopback port 4000 and serves Swagger at `/docs` in local development. Swagger lists endpoints from every FORGE preset. Requests require the corresponding features to be enabled in the active preset. `GET /api/v1/health` checks PostgreSQL through Prisma and is available through the web origin.
 
 See [testing](docs/TESTING.md), [configuration](docs/CONFIGURATION.md), [deployment](docs/DEPLOYMENT.md), and [the roadmap](docs/ROADMAP.md). Agents start with [AGENTS.md](AGENTS.md) and [the session state](.ai/STATE.md).
 

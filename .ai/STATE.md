@@ -36,3 +36,20 @@ Recheck native PWA installation on the hosted runner for each release. The manag
 
 - The production build and all 20 applicable SaaS Playwright checks passed, including the new deployment smoke command. Lint, type checks, and all 15 unit tests passed.
 - The local Compose database produced a mode-0600 archive. Restore verified the schema in a disposable database. An existing backup kept its original hash, and a corrupt archive failed without leaving a scratch database. [Deployment commands](../docs/DEPLOYMENT.md#postgresql-recovery-rehearsal)
+
+## Windows local startup
+
+- On 2026-11-20, the frozen install completed after retrying a registry timeout. PostgreSQL 17 became healthy and Prisma applied all 13 migrations. The home page, status page, and Swagger returned HTTP 200. The deployment smoke check passed against the running development stack.
+
+## Local Swagger catalog
+
+- Swagger served 51 paths and 63 operations, matching the generated OpenAPI contract. The local deployment smoke check passed.
+
+## SaaS demo seed
+
+- The built-in seed inserted three Persian workspaces. Two local demo accounts were provisioned. Both signed in through the web origin. The administrator saw all three seeded workspaces, and the member received HTTP 403 from the workspace API.
+
+## All-feature local demo
+
+- Configuration validation and the preset seed succeeded. Eleven frontend routes returned HTTP 200 after admin sign-in. Verified seeded workspaces, marketplace, booking, community, and learning content, plus configured progress, challenge, reward, and season pages. The deployment smoke check passed.
+- The unit suite passed 14 of 15 tests. On a retry with a longer timeout, the scaffold test failed with Windows EPERM while renaming its temporary project directory.

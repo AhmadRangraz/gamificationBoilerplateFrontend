@@ -1,12 +1,12 @@
 import 'reflect-metadata';
+import { readFileSync } from 'node:fs';
 import { forgeConfig, resolveApiPort } from '@forge/config';
 import { ConsoleLogger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule, type OpenAPIObject } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 import { parseWebOrigin } from './auth/auth.guards.js';
 import { configureApp } from './bootstrap.js';
-import { describeApi } from './openapi.js';
 
 async function main() {
   if (process.env.NODE_ENV !== 'production') {
@@ -30,7 +30,17 @@ async function main() {
   app.enableShutdownHooks();
 
   if (forgeConfig.features.apiDocs && process.env.NODE_ENV !== 'production') {
-    SwaggerModule.setup('docs', app, () => describeApi(app));
+    SwaggerModule.setup('docs', app, () => {
+      const contract = JSON.parse(
+        readFileSync(
+          new URL('../../../packages/api-client/openapi.json', import.meta.url),
+          'utf8',
+        ),
+      ) as OpenAPIObject;
+      contract.info.title = forgeConfig.project.name;
+      contract.info.description = `${forgeConfig.project.description}\n\nThis catalog lists endpoints for every FORGE preset. Availability depends on the active preset and feature flags.`;
+      return contract;
+    });
   }
 
   await app.listen(

@@ -11,3 +11,13 @@ Email, reward fulfillment and assistant responses remain local or mocked. Native
 M9 passed all nine hosted jobs, including native PWA installation, for commit `ed71145`. The run retains Playwright reports. [Release verification](../docs/TESTING.md#release-verification)
 
 M10 adds the deployment smoke command and a local PostgreSQL backup and recovery rehearsal. Run the smoke command through the web origin after each deployment. [Operations commands](../docs/DEPLOYMENT.md#deployment-smoke-check)
+
+## Running locally on Windows
+
+The development stack was left running on 2026-11-20. Open [FORGE](http://localhost:3000) or [Swagger](http://127.0.0.1:4000/docs). PostgreSQL is healthy in the Compose service.
+
+Local Swagger now shows the full catalog. The active preset determines which operations accept requests.
+
+The local SaaS demo includes three Persian workspaces, a verified demo administrator, and an unverified demo member for the email flow.
+
+The existing local demo accounts still work with the all-feature configuration. Open the home navigation to reach Marketplace, Booking, Community, Learning, the local assistant, and gamification.

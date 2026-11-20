@@ -24,3 +24,13 @@ The hosted headed Chromium check verified native installation. The managed local
 ## Release follow-up
 
 Verify the hosted release run for the commit being reviewed and record the native result and artifact links. Run `pnpm ops:smoke` with the deployed web origin and rehearse PostgreSQL recovery on the local Compose database before release. [Release checks](../docs/TESTING.md#release-verification) · [Operations commands](../docs/DEPLOYMENT.md#deployment-smoke-check)
+
+## Windows local startup
+
+Use `pnpm setup` followed by `pnpm dev`. After startup, run `node tooling/deployment-smoke.mjs http://localhost:3000` to recheck the web-to-database path.
+
+After changing API controllers, regenerate the OpenAPI contract and compare the live Swagger JSON at `/docs-json` with the generated paths.
+
+Use the local SaaS demo accounts to verify sign-in and the administrator workspace page after a database change.
+
+Edit `forge.config.ts` to change feature overrides and gamification. Validate, seed, and restart the development servers after switching features.
