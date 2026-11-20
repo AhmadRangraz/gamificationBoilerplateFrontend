@@ -3,6 +3,8 @@ export const fa = {
   navigation: 'ناوبری اصلی',
   workspace: 'فضای توسعه',
   overview: 'نمای کلی',
+  moreNavigation: 'بیشتر',
+  gamificationAdmin: 'مدیریت بازی‌وارسازی',
   flow: 'مسیر داده',
   heroTitle: 'نمای کلی سامانه',
   heroDescription:

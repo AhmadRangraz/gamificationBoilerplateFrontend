@@ -105,3 +105,7 @@ Compatibility references reviewed before installing dependencies included the of
 - Provisioned demo accounts in the loopback development database using the existing password hasher and generated passwords.
 
 - Keep the SaaS home and existing development database for the combined demo. Enable every feature through explicit overrides and configure a group challenge and season with UTC windows.
+
+- Keep operational status at /status and share the product overview between /docs and the home route when the preset has no custom landing page. Keep core actions visible on mobile and move secondary modules into More.
+
+- Expanded the running PostgreSQL demo with local fixtures. Used stable fixture identifiers and the existing gamification award function for lesson, listing, and post activity.

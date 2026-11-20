@@ -5,6 +5,7 @@ import { presetRoutes } from './lib/preset-copy';
 const apiOrigin = resolveApiOrigin(forgeConfig, process.env.FORGE_API_ORIGIN);
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   poweredByHeader: false,
   transpilePackages: ['@forge/ui'],
   async headers() {

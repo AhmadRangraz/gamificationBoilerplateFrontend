@@ -34,3 +34,7 @@ After changing API controllers, regenerate the OpenAPI contract and compare the 
 Use the local SaaS demo accounts to verify sign-in and the administrator workspace page after a database change.
 
 Edit `forge.config.ts` to change feature overrides and gamification. Validate, seed, and restart the development servers after switching features.
+
+After changing navigation or preset flags, verify the visible My Progress entry and More menu on a narrow viewport and check feature availability on /docs.
+
+For the expanded demo, sign in as the member to show favorites, bookings, community notifications, assistant history, and progress. Use the administrator for the workspace list.

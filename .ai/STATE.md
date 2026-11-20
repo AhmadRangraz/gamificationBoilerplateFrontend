@@ -53,3 +53,11 @@ Recheck native PWA installation on the hosted runner for each release. The manag
 
 - Configuration validation and the preset seed succeeded. Eleven frontend routes returned HTTP 200 after admin sign-in. Verified seeded workspaces, marketplace, booking, community, and learning content, plus configured progress, challenge, reward, and season pages. The deployment smoke check passed.
 - The unit suite passed 14 of 15 tests. On a retry with a longer timeout, the scaffold test failed with Windows EPERM while renaming its temporary project directory.
+
+## Product overview and navigation
+
+- Verified the Persian home and /docs overview, all 13 feature cards, and the signed-in path to My Progress in Chromium. At 375 px the More menu opens and closes by keyboard without horizontal overflow. Axe reported no violations in the three themes tested. Web typecheck, targeted ESLint, and deployment smoke passed.
+
+## Expanded local demo data
+
+- Added six workspaces, twelve listings, four services, three courses with nine lessons, six community posts, six private conversations, and four leaderboard profiles. Both demo accounts still signed in. Verified ten frontend routes and the deployment smoke check. The demo member earned 100 points and 90 XP through the normal event logic.

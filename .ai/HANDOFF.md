@@ -21,3 +21,7 @@ Local Swagger now shows the full catalog. The active preset determines which ope
 The local SaaS demo includes three Persian workspaces, a verified demo administrator, and an unverified demo member for the email flow.
 
 The existing local demo accounts still work with the all-feature configuration. Open the home navigation to reach Marketplace, Booking, Community, Learning, the local assistant, and gamification.
+
+Open /docs for the product catalog, /progress for gamification, and /status for service health.
+
+The expanded dataset lives in the current local database. The built-in seed still provides the baseline fixtures on a fresh checkout.
